@@ -1,4 +1,5 @@
 from flask import Flask
+#flask --app host run
 
 app = Flask(__name__)
 
