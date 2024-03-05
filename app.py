@@ -8,6 +8,17 @@ app = Flask(__name__)
 def homepage():
     return send_file("TEST_webpage.html")
 
+@app.route("/styles.css")
+def css():
+    return send_file("styles.css")
+
+@app.route("/scripts/<name>.js")
+def get_js(name):
+    if os.path.exists("scripts/" + name + ".js"):
+        return send_file("scripts/" + name + ".js")
+    else:
+        return abort(404)
+
 @app.route("/favicon.ico")
 def favicon():
     return send_file("favicon.ico")
