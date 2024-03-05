@@ -1,0 +1,39 @@
+/* styles.css */
+
+/* Setting the background color */
+body {
+    background-color: #5f97ff;
+}
+
+/* Styling the heading */
+h1 {
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Styling the body */
+p {
+    color: #333;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+/* Centering the image */
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Adding some style to links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
