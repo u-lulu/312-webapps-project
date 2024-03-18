@@ -2,6 +2,8 @@ from flask import Flask, send_file, abort, make_response, request, jsonify
 from pymongo import MongoClient
 from copy import deepcopy
 from uuid import uuid4
+from rolldice import roll_dice, DiceGroupException, DiceOperatorException
+from func_timeout import func_timeout, FunctionTimedOut
 import os
 #python -m flask run
 
@@ -57,7 +59,7 @@ def get_image(filename):
 
 @app.route("/text-post", methods=['POST'])
 def text_post():
-    text = request.form.get('body_text')
+    text = request.form.get('body_text').strip()
     name = "Guest" # TODO: Get name dynamically if the post is made with a login token
     id = make_id()
     object = {
@@ -71,7 +73,31 @@ def text_post():
 
 @app.route("/dice-post", methods=['POST'])
 def dice_post():
-    pass
+    syntax = request.form.get('dice_text').strip()
+    name = "Guest" # TODO: Get name dynamically if the post is made with a login token
+    id = make_id()
+
+    total,output = None,None
+    try:
+        total,output = func_timeout(5, roll_dice,args=[syntax])
+    except DiceGroupException as e:
+        return make_response(f"{e}",400)
+    except FunctionTimedOut as e:
+        return make_response("It took too long to roll your dice (>5s). Roll less dice.",400)
+    except (ValueError, DiceOperatorException) as e:
+        return make_response("Could not properly parse your dice result. This usually means the result is much too large. Try rolling dice that will result in a smaller range of values.",400)
+
+    object = {
+        "type":"text",
+        "username":escape_html(name),
+        "input":escape_html(syntax),
+        "output":output,
+        "total":total,
+        "uuid":id
+    }
+
+    message_collection.insert_one(object)
+    return make_response(id,201)
 
 @app.route("/posts", methods=['GET'])
 def get_posts():
