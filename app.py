@@ -1,61 +1,46 @@
-from flask import Flask, send_file, abort, make_response, request, jsonify
-from pymongo import MongoClient
-from copy import deepcopy
-from uuid import uuid4
-from rolldice import roll_dice, DiceGroupException, DiceOperatorException
-from func_timeout import func_timeout, FunctionTimedOut
+from flask import Flask, send_file, abort, make_response
 import os
 #python -m flask run
 
-mongo_client = MongoClient("mongo:27017")
-db = mongo_client["animelovers"]
-message_collection = db["messages"]
-
 app = Flask(__name__)
 
-def escape_html(text):
-    escaper_mapping = {
-        "&":"&amp",
-        "<":"&lt",
-        ">":"&gt"
-    }
-    for key in escaper_mapping:
-        text = text.replace(key, escaper_mapping[key])
-    return text
-
-def make_id():
-    return str(uuid4())
-
 def serve_file(path):
-    response = make_response(send_file(path),200)
+    response = make_response(send_file(path))
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
-@app.route("/", methods=['GET'])
+@app.route("/")
 def homepage():
     return serve_file("TEST_webpage.html")
 
-@app.route("/styles.css", methods=['GET'])
+@app.route("/styles.css")
 def css():
     return serve_file("styles.css")
 
-@app.route("/scripts/<name>.js", methods=['GET'])
+@app.route("/scripts/<name>.js")
 def get_js(name):
     if os.path.exists("scripts/" + name + ".js"):
         return serve_file("scripts/" + name + ".js")
     else:
         return abort(404)
 
-@app.route("/favicon.ico", methods=['GET'])
+@app.route("/favicon.ico")
 def favicon():
     return serve_file("favicon.ico")
 
-@app.route("/images/<filename>", methods=['GET'])
+@app.route("/images/<filename>")
 def get_image(filename):
     if os.path.exists("images/" + filename):
         return serve_file("images/" + filename)
     else:
         return abort(404)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form=request.form
+    print(form.getlist("username_reg")[0])
+    return serve_file("TEST_webpage.html")
+
 
 @app.route("/text-post", methods=['POST'])
 def text_post():
