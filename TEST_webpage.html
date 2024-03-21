@@ -12,5 +12,17 @@
     <img src="images/TEST_SniperDecoy.png">
     <p class="jstest">If you can see this text, loading JavaScript isn't working.</p>
     <script src="scripts/TEST_paragraph_filler.js"></script>
+
+    <form action="/register" method="post" enctype="application/x-www-form-urlencoded">
+        <label>Username:
+            <input id="reg-form-username" type="text" name="username_reg"/>
+        </label>
+        <br/>
+        <label>Password:&nbsp;
+            <input id="reg-form-pass" type="password" name="password_reg">
+        </label>
+        <input type="submit" value="Post">
+    </form>
+    
 </body>
 </html>
