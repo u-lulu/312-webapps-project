@@ -1,8 +1,13 @@
 from flask import Flask, send_file, abort, make_response
 import os
+from pymongo import MongoClient
+import bcrypt
 #python -m flask run
 
 app = Flask(__name__)
+mongo_client = MongoClient("mongo:27017")
+db = mongo_client["animelovers"]
+user_collection = db["users"]
 
 def serve_file(path):
     response = make_response(send_file(path))
@@ -38,7 +43,18 @@ def get_image(filename):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form=request.form
-    print(form.getlist("username_reg")[0])
+    username=form.getlist("username_reg")[0]
+    password1=form.getlist("password_reg")[0]
+    password2=form.getlist("password_reg2")[0]
+
+    if password1==password2:
+        for user in user_collection.find():
+            del user["_id"]
+            if user["user"]==username:
+                return serve_file("TEST_webpage.html")
+        hashedpassword=bcrypt.hashpw(password1.encode("utf-8"),bcrypt.gensalt())
+        user_collection.insert_one({"user":username, "pass":hashedpassword, "Hashed authentication token":-1})
+
     return serve_file("TEST_webpage.html")
 
 
