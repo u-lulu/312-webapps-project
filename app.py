@@ -1,4 +1,4 @@
-from flask import Flask, send_file, abort, make_response
+from flask import Flask, send_file, abort, make_response, request 
 import os
 #python -m flask run
 
@@ -34,3 +34,9 @@ def get_image(filename):
         return serve_file("images/" + filename)
     else:
         return abort(404)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form=request.form
+    print(form.getlist("username_reg")[0])
+    return serve_file("TEST_webpage.html")
