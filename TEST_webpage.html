@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE 312 Project</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+
+
+<body> 
+    <script src="scripts/TEST_paragraph_filler.js"></script>
+    <script src="scripts/function.js"></script>
+    <h1>Hello, World!</h1>
+    <p>Here's a little paragraph. Yay! And also a link to somewhere else: <a src="https://www.youtube.com/watch?v=NY4u1JeG-2Y">good song</a></p>
+    <img src="images/TEST_SniperDecoy.png">
+    <p class="jstest">If you can see this text, loading JavaScript isn't working.</p>
+
+  
+    <h2>Testing Text Entry</h2>
+    
+    <form action="/text-post" method="POST">
+        <label for="body_text">Enter Text:</label><br>
+        <input type="text" id="body_text" name="body_text"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <h2>Testing Dice Entry</h2>
+    <form id="/dice-post" >
+        <label for="body_text">Enter <a src="https://github.com/fionafibration/py-rolldice#dice-syntax">Dice Syntax</a>:</label><br>
+        <input type="text" id="dice_text" name="dice_text"><br><br>
+        <button onclick="dicePost();">Submit</button>
+    </form>
+    
+</body>
+</html>
