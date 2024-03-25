@@ -8,6 +8,10 @@ COPY . .
 # Download Dependencies
 RUN pip3 install -r requirements.txt
 
-EXPOSE 8000
+EXPOSE 5000
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait
+RUN chmod +x /wait
+
+# Command to run the Flask app
+CMD ["sh", "-c", "/wait mongo:27017 -- python -m flask run --host=0.0.0.0"]
