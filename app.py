@@ -43,9 +43,31 @@ def serve_file(path):
     return response
 
 
+def serve_html(file):
+    response = make_response(file)
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
+def redirect_content():
+    response = make_response(redirect(url_for("homepage")))
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
 @app.route("/")
 def homepage():
-    return serve_file("TEST_webpage.html")
+    # Check if a user is authenticated and display their username
+    authenticated_user = is_authenticated(user_collection)
+    if authenticated_user:
+        html_content = open("TEST_webpage.html", 'rb').read()
+        updated_html_content = html_content.replace(b'{{Guest}}', authenticated_user["user"].encode())
+        return serve_html(updated_html_content)
+
+    elif authenticated_user is False:
+        html_content = open("TEST_webpage.html", 'rb').read()
+        updated_html_content = html_content.replace(b'{{Guest}}', "Guest".encode())
+        return serve_html(updated_html_content)
 
 
 @app.route("/styles.css")
@@ -85,11 +107,11 @@ def register():
         for user in user_collection.find():
             del user["_id"]
             if user["user"] == username:
-                return serve_file("TEST_webpage.html")
+                return redirect_content()
         hashedpassword = bcrypt.hashpw(password1.encode("utf-8"), bcrypt.gensalt())
         user_collection.insert_one({"user": username, "pass": hashedpassword, "Hashed authentication token": -1})
 
-    return serve_file("TEST_webpage.html")
+    return redirect_content()
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -110,19 +132,20 @@ def login():
 
             # Create a response, send the auth token as a non session cookie, and then redirect them to the home page
             response = make_response(redirect(url_for("homepage")))
+            response.headers['X-Content-Type-Options'] = 'nosniff'
             response.set_cookie("Authentication-token", auth_token, expires=datetime.utcnow() + timedelta(hours=1), httponly=True)
             return response
         else:
-            return serve_file("TEST_webpage.html")
+            return redirect_content()
     else:
-        return serve_file("TEST_webpage.html")
+        return redirect_content()
 
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     authenticated_user = is_authenticated(user_collection)
     if authenticated_user is False:
-        return serve_file("TEST_webpage.html")
+        return redirect_content()
     elif authenticated_user is not False:
         # Update the database to revoke the token
         query = {"user": authenticated_user["user"], "pass": authenticated_user["pass"], "Hashed authentication token": authenticated_user["Hashed authentication token"]}
@@ -131,6 +154,7 @@ def logout():
 
         # Invalidate the token
         response = make_response(redirect(url_for("homepage")))
+        response.headers['X-Content-Type-Options'] = 'nosniff'
         response.set_cookie("Authentication-token", "", expires=0)
         return response
 
@@ -176,7 +200,7 @@ def dice_post():
     }
 
     message_collection.insert_one(object)
-    return make_response(id,201)
+    return make_response(id, 201)
 
 
 @app.route("/posts", methods=['GET'])
