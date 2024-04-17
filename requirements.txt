@@ -1,5 +1,6 @@
-flask==3.0.2
-pymongo==4.6.1
+flask==3.0.3
+flask-socketio==5.3.6
+pymongo==4.6.3
 uuid==1.30
 func-timeout==4.3.5
 py-rolldice==0.4.0
