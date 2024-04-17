@@ -1,4 +1,5 @@
 from flask import Flask, send_file, abort, make_response, request, jsonify, redirect, url_for
+from flask_socketio import SocketIO, send, emit
 from copy import deepcopy
 import uuid
 from uuid import uuid4
@@ -20,6 +21,8 @@ user_collection = db["user"]
 message_collection = db["messages"]
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '140472150481043457'
+socketio = SocketIO(app)
 
 
 def escape_html(text):
@@ -227,3 +230,14 @@ def get_one_post(id):
         del result['id']
     return make_response(jsonify(result), 200)
 
+
+@socketio.on('connect')
+def test_connect(auth):
+    print("Client connected!")
+
+@socketio.on('disconnect')
+def test_connect():
+    print("Client disconnected...")
+
+if __name__ == "__main__":
+    socketio.run(app)
