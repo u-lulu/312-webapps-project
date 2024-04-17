@@ -233,11 +233,13 @@ def get_one_post(id):
 
 @socketio.on('connect')
 def test_connect(auth):
-    print("Client connected!")
+    name = retrieve_user(user_collection)
+    print(f"Client '{name}' connected!")
 
 @socketio.on('disconnect')
 def test_connect():
-    print("Client disconnected...")
+    name = retrieve_user(user_collection)
+    print(f"Client '{name}' disconnected.")
 
 if __name__ == "__main__":
     socketio.run(app)
