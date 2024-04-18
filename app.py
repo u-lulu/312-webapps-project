@@ -11,7 +11,6 @@ import os
 from pymongo import MongoClient
 import bcrypt
 from auth import hash_auth_token, is_authenticated, retrieve_user
-#python -m flask run
 
 
 # Setting up the database
@@ -162,7 +161,7 @@ def logout():
         return response
 
 
-@app.route("/text-post", methods=['POST'])
+"""@app.route("/text-post", methods=['POST'])
 def text_post():
     text = request.form.get('body_text').strip()
     name = retrieve_user(user_collection)
@@ -174,10 +173,49 @@ def text_post():
         "uuid": id
     }
     message_collection.insert_one(object)
-    return make_response(id, 201)
+    return id, 201"""
 
+@socketio.on('chat_message')
+def text_post(text):
+    name = retrieve_user(user_collection)
+    id = make_id()
+    object = {
+        "type": "text",
+        "username": escape_html(name),
+        "body": escape_html(text),
+        "uuid": id
+    }
+    emit('message',object)
+    message_collection.insert_one(object)
 
-@app.route("/dice-post", methods=['POST'])
+@socketio.on('dice_message')
+def dice_post(syntax):
+    name = retrieve_user(user_collection)
+    id = make_id()
+
+    total, output = None, None
+    try:
+        total, output = func_timeout(5, roll_dice, args=[syntax])
+    except DiceGroupException as e:
+        return make_response(f"{e}", 400)
+    except FunctionTimedOut as e:
+        return make_response("It took too long to roll your dice (>5s). Roll less dice.", 400)
+    except (ValueError, DiceOperatorException) as e:
+        return make_response("Could not properly parse your dice result. This usually means the result is much too large. Try rolling dice that will result in a smaller range of values.",400)
+
+    object = {
+        "type": "dice",
+        "username": escape_html(name),
+        "input": escape_html(syntax),
+        "output": output,
+        "total": total,
+        "uuid": id
+    }
+
+    emit('message',object)
+    message_collection.insert_one(object)
+
+"""@app.route("/dice-post", methods=['POST'])
 def dice_post():
     syntax = request.form.get('dice_text').strip()
     name = retrieve_user(user_collection)
@@ -203,8 +241,8 @@ def dice_post():
     }
 
     message_collection.insert_one(object)
-    return make_response(id, 201)
-
+    emit(object)
+    return id, 201"""
 
 @app.route("/posts", methods=['GET'])
 def get_posts():
@@ -216,7 +254,7 @@ def get_posts():
         if 'id' in record:
             del record['id']
         output.append(record)
-    return make_response(jsonify(output), 200)
+    return jsonify(output), 200
 
 
 @app.route("/posts/<id>", methods=['GET'])
@@ -228,7 +266,7 @@ def get_one_post(id):
         del result['_id']
     if 'id' in result:
         del result['id']
-    return make_response(jsonify(result), 200)
+    return jsonify(result), 200
 
 
 @socketio.on('connect')
@@ -242,4 +280,4 @@ def test_connect():
     print(f"Client '{name}' disconnected.")
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app,allow_unsafe_werkzeug=True)

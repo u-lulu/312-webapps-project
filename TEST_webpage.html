@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSE 312 Project</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 </head>
 <body>
     <h1>Hello, {{Guest}}</h1>
@@ -51,16 +53,16 @@
 
     <!-- Message Forms -->
     <h2>Text Entry</h2>
-    <form action="/text-post" method="post">
+    <form id="message_form">
         <label for="body_text">Enter Text:</label><br>
-        <input type="text" id="body_text" name="body_text"><br><br>
-        <input type="submit" value="Submit">
+        <input type="text" id="body_text" name="body_text"/><br>
+        <button type="submit">Send</button>
     </form>
     <h2>Dice Entry</h2>
-    <form action="/dice-post" method="post">
-        <label for="body_text">Enter <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
-        <input type="text" id="dice_text" name="dice_text"><br><br>
-        <input type="submit" value="Submit">
+    <form id="dice_form">
+        <label for="body_text">Enter some <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
+        <input type="text" id="dice_text" name="dice_text"/><br>
+        <button type="submit">Send</button>
     </form>
 
     <!-- Message List -->
@@ -98,12 +100,63 @@
             });
     </script>
 
-    <!-- Websocket Boilerplate -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <!-- Websocket Handler -->
     <script type="text/javascript" charset="utf-8">
         var socket = io();
         socket.on('connect', function() {
             socket.emit('my event', {data: 'I\'m connected!'});
+        });
+
+        // Handle form submission
+        $('#message_form').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Get the message from the input field
+            var message = $('#body_text').val().trim();
+
+            // Check if the message is not empty
+            if (message !== '') {
+                // Send the message to the server via WebSocket
+                socket.emit('chat_message', message);
+
+                // Clear the input field
+                $('#body_text').val('');
+            }
+        });
+
+        // Handle dice submission
+        $('#dice_form').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Get the message from the input field
+            var message = $('#dice_text').val().trim();
+
+            // Check if the message is not empty
+            if (message !== '') {
+                // Send the message to the server via WebSocket
+                socket.emit('dice_message', message);
+
+                // Clear the input field
+                $('#dice_text').val('');
+            }
+        });
+
+        // Function to add a new message to the list
+        function addMessage(message) {
+            $('#messages').append($('<li>').text(message));
+        }
+
+        // Receive messages from server
+        socket.on('message', function(message) {
+            if (message.type === 'text') {
+                // Extract username and body
+                const formattedMessage = `${message.username}: ${message.body}`;
+                addMessage(formattedMessage);
+            } else if (message.type === 'dice') {
+                // Extract username, input, output, and total
+                const formattedMessage = `${message.username} rolled ${message.input} and got ${message.total} (${message.output})`;
+                addMessage(formattedMessage);
+            }
         });
     </script>
 
