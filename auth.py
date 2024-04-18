@@ -29,7 +29,7 @@ def is_authenticated(db_collection):
 def retrieve_user(db_collection):
     valid_user = is_authenticated(db_collection)
     if valid_user is not False:
-        return valid_user["user"]
+        return valid_user
     else:
-        return "Guest"
+        return {"user": "Guest", "Profile-Pic": "./images/TEST_SniperDecoy.png"}
 
