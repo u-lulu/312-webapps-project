@@ -160,21 +160,6 @@ def logout():
         response.set_cookie("Authentication-token", "", expires=0)
         return response
 
-
-"""@app.route("/text-post", methods=['POST'])
-def text_post():
-    text = request.form.get('body_text').strip()
-    name = retrieve_user(user_collection)
-    id = make_id()
-    object = {
-        "type": "text",
-        "username": escape_html(name),
-        "body": escape_html(text),
-        "uuid": id
-    }
-    message_collection.insert_one(object)
-    return id, 201"""
-
 @socketio.on('chat_message')
 def text_post(text):
     name = retrieve_user(user_collection)
@@ -214,35 +199,6 @@ def dice_post(syntax):
 
     emit('message',object)
     message_collection.insert_one(object)
-
-"""@app.route("/dice-post", methods=['POST'])
-def dice_post():
-    syntax = request.form.get('dice_text').strip()
-    name = retrieve_user(user_collection)
-    id = make_id()
-
-    total, output = None, None
-    try:
-        total, output = func_timeout(5, roll_dice, args=[syntax])
-    except DiceGroupException as e:
-        return make_response(f"{e}", 400)
-    except FunctionTimedOut as e:
-        return make_response("It took too long to roll your dice (>5s). Roll less dice.", 400)
-    except (ValueError, DiceOperatorException) as e:
-        return make_response("Could not properly parse your dice result. This usually means the result is much too large. Try rolling dice that will result in a smaller range of values.",400)
-
-    object = {
-        "type": "dice",
-        "username": escape_html(name),
-        "input": escape_html(syntax),
-        "output": output,
-        "total": total,
-        "uuid": id
-    }
-
-    message_collection.insert_one(object)
-    emit(object)
-    return id, 201"""
 
 @app.route("/posts", methods=['GET'])
 def get_posts():
