@@ -22,7 +22,7 @@ p {
 }
 
 /* Centering the image */
-img {
+.center_profile {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -36,4 +36,13 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Styling for the profile pic */
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Makes the image round */
+    margin-right: 10px; /* Adds some space between the profile picture and the message */
+    object-fit: cover;
 }
