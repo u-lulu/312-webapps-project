@@ -165,7 +165,7 @@ def logout():
 @app.route("/text-post", methods=['POST'])
 def text_post():
     text = request.form.get('body_text').strip()
-    name = retrieve_user(user_collection)  # TODO: Get name dynamically if the post is made with a login token
+    name = retrieve_user(user_collection)
     id = make_id()
     object = {
         "type": "text",
@@ -180,7 +180,7 @@ def text_post():
 @app.route("/dice-post", methods=['POST'])
 def dice_post():
     syntax = request.form.get('dice_text').strip()
-    name = retrieve_user(user_collection)  # TODO: Get name dynamically if the post is made with a login token
+    name = retrieve_user(user_collection)
     id = make_id()
 
     total, output = None, None
@@ -194,7 +194,7 @@ def dice_post():
         return make_response("Could not properly parse your dice result. This usually means the result is much too large. Try rolling dice that will result in a smaller range of values.",400)
 
     object = {
-        "type": "text",
+        "type": "dice",
         "username": escape_html(name),
         "input": escape_html(syntax),
         "output": output,

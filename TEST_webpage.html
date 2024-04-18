@@ -50,18 +50,53 @@
 
 
     <!-- Message Forms -->
-    <h2>Testing Text Entry</h2>
+    <h2>Text Entry</h2>
     <form action="/text-post" method="post">
         <label for="body_text">Enter Text:</label><br>
         <input type="text" id="body_text" name="body_text"><br><br>
         <input type="submit" value="Submit">
     </form>
-    <h2>Testing Dice Entry</h2>
+    <h2>Dice Entry</h2>
     <form action="/dice-post" method="post">
         <label for="body_text">Enter <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
         <input type="text" id="dice_text" name="dice_text"><br><br>
         <input type="submit" value="Submit">
     </form>
+
+    <!-- Message List -->
+    <h2>Messages</h2>
+    <ul id="messages"></ul>
+
+    <script>
+        // Make a request to the /posts route
+        fetch('/posts')
+            .then(response => response.json())
+            .then(data => {
+                // Function to add a new message to the list
+                function addMessage(message) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = message;
+                    document.getElementById('messages').appendChild(listItem);
+                }
+
+                // Loop through each message in the list
+                data.forEach(message => {
+                    // Check the type of the message
+                    if (message.type === 'text') {
+                        // Extract username and body
+                        const formattedMessage = `${message.username}: ${message.body}`;
+                        addMessage(formattedMessage);
+                    } else if (message.type === 'dice') {
+                        // Extract username, input, output, and total
+                        const formattedMessage = `${message.username} rolled ${message.input} and got ${message.total} (${message.output})`;
+                        addMessage(formattedMessage);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching messages:', error);
+            });
+    </script>
 
     <!-- Websocket Boilerplate -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
