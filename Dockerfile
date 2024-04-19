@@ -9,6 +9,7 @@ COPY . .
 RUN pip3 install -r requirements.txt
 
 EXPOSE 5000
+EXPOSE 8080
 
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait
 RUN chmod +x /wait
