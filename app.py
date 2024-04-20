@@ -180,7 +180,7 @@ def register():
                 return redirect_content()
         hashedpassword = bcrypt.hashpw(password1.encode("utf-8"), bcrypt.gensalt())
         user_collection.insert_one(
-            {"user": username, "pass": hashedpassword, "Hashed authentication token": -1, "Profile-Pic": ""})
+            {"user": username, "pass": hashedpassword, "Hashed authentication token": -1, "Profile-Pic": "./images/TEST_SniperDecoy.png"})
     return redirect_content()
 
 

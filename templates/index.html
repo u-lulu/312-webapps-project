@@ -11,13 +11,7 @@
 <body>
     <h1>Hello, {{ username }}!</h1>
     <p>Here's a little paragraph. Yay! And also a link to somewhere else: <a href="https://www.youtube.com/watch?v=NY4u1JeG-2Y" target="_blank" rel="noreferrer noopener">good song</a></p>
-
-    {% if profile_pic %}
-        <img src="{{ url_for('serve_upload', filename=profile_pic) }}" alt="Profile Image" width="100" height="100" class="center_profile">
-    {% else %}
-        <img src="images/mario_party_block.gif" width="100" height="100" class="center_profile">
-    {% endif %}
-
+    <img src="images/transparent_mario_party_block.gif" width="200" height="200" class="center_profile">
     <p class="jstest">If you can see this text, loading JavaScript isn't working.</p>
 
     <!-- Registration Forms -->
