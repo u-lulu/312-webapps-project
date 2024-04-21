@@ -1,48 +1,52 @@
-/* styles.css */
-
-/* Setting the background color */
 body {
-    background-color: #5f97ff;
-}
-
-/* Styling the heading */
-h1 {
-    color: #333;
+    margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    font-size: 24px;
-    text-align: center;
-    margin-top: 50px;
+    height: 100vh; /* Set body height to 100% of viewport height */
+    display: flex;
+    flex-direction: column; /* Stack child elements vertically */
 }
 
-/* Styling the body */
-p {
-    color: #333;
-    font-family: Arial, sans-serif;
-    text-align: center;
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 54;
 }
 
-/* Centering the image */
-.center_profile {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+#logo {
+    max-width: 100px;
+    height: auto;
 }
 
-/* Adding some style to links */
-a {
-    color: #007bff;
-    text-decoration: none;
+.container {
+    display: flex;
+    flex: 1; /* Grow to fill available space */
 }
 
-a:hover {
-    text-decoration: underline;
+#middle {
+    height: 80vh;
 }
 
-/* Styling for the profile pic */
-.profile-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; /* Makes the image round */
-    margin-right: 10px; /* Adds some space between the profile picture and the message */
-    object-fit: cover;
+#left-container {
+    flex: 1;
+    background-color: #f2f2f2;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+#right-container {
+    flex: 1;
+    padding: 20px;
+}
+
+#bottom-container {
+    background-color: #ccc;
+    padding: 20px;
+}
+
+form {
+    margin-bottom: 20px;
 }

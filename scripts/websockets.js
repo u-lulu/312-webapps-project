@@ -30,7 +30,7 @@ fetch('/posts')
 
             else if (message.type == 'dice'){
                 // Create a text node for the message content by extracting the profile pic, username, input, output, and total
-                const messageText = document.createTextNode(`${message.profile_pic} ${message.username} rolled ${message.input} and got ${message.total} ${message.output}`);
+                const messageText = document.createTextNode(`${message.profile_pic} ${message.username} rolled ${message.input} and got ${message.total} (${message.output})`);
                 listItem.appendChild(messageText);
             }
 

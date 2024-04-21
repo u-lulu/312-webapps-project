@@ -9,14 +9,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>Hello, {{ username }}!</h1>
-    <p>Here's a little paragraph. Yay! And also a link to somewhere else: <a href="https://www.youtube.com/watch?v=NY4u1JeG-2Y" target="_blank" rel="noreferrer noopener">good song</a></p>
-    <img src="images/transparent_mario_party_block.gif" width="200" height="200" class="center_profile">
-    <p class="jstest">If you can see this text, loading JavaScript isn't working.</p>
 
-    <!-- Registration Forms -->
-    {% if not authenticated %}
-        <div id="registration" style="display: block;">
+<header>
+    <img src="images/transparent_mario_party_block.gif" width="100" height="100" class="center_profile"> Hello, {{ username }}!
+</header>
+
+<div class="container" id="middle">
+    <div id="left-container">
+        <h2>Messages</h2>
+        <ul id="messages"></ul>
+        <script src="scripts/websockets.js"></script>
+    </div>
+
+    <div id="right-container">
+        <!-- Registration Forms -->
+        {% if not authenticated %}
             Register
             <form action="/register" method="post" enctype="application/x-www-form-urlencoded">
                 <label>Username:
@@ -45,18 +52,33 @@
                 </label>
                 <input type="submit" value="Post">
             </form>
-        </div>
-    {% else %}
-        <!-- Logout Button -->
-        <div id="logout">
+        {% else %}
+            <!-- Logout Button -->
             <form action="/logout" method="post" name="logout-User" enctype="application/x-www-form-urlencoded" id="logout-user">
                 <input type="submit" value="Logout">
             </form>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
+</div>
 
-    <!-- Uploading images -->
-    {% if authenticated %}
+<div class="container" id="bottom-container">
+    <div id="right-container">
+        <form id="message_form">
+            <label for="body_text">Enter Message:</label><br>
+            <input type="text" id="body_text" name="body_text"/><br>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <div id="right-container">
+        <form id="dice_form">
+            <label for="body_text">Enter some <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
+            <input type="text" id="dice_text" name="dice_text"/><br>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <div id="right-container">
+        <!-- Uploading images -->
+        {% if authenticated %}
         <form action="/upload-profile-pic" id="image-form" method="post" enctype="multipart/form-data">
             {% if not profile_pic %}
                 <label for="form-file">Upload A Profile Pic: </label>
@@ -66,30 +88,11 @@
             <input id="form-file" type="file" name="file">
             <input type="submit" value="Post">
         </form>
-    {% else %}
-        <p>Please log in to upload a profile pic!</p>
-    {% endif %}
-
-    <!-- Message Forms -->
-    <h2>Text Entry</h2>
-    <form id="message_form">
-        <label for="body_text">Enter Text:</label><br>
-        <input type="text" id="body_text" name="body_text"/><br>
-        <button type="submit">Send</button>
-    </form>
-    <h2>Dice Entry</h2>
-    <form id="dice_form">
-        <label for="body_text">Enter some <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
-        <input type="text" id="dice_text" name="dice_text"/><br>
-        <button type="submit">Send</button>
-    </form>
-
-
-    <!-- Message List -->
-    <h2>Messages</h2>
-    <ul id="messages"></ul>
-    <script src="scripts/websockets.js"></script>
-    <script src="scripts/TEST_paragraph_filler.js"></script>
+        {% else %}
+            <p>Please log in to upload a profile pic!</p>
+        {% endif %}
+    </div>
+</div>
 
 </body>
 </html>
