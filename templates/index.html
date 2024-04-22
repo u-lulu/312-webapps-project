@@ -17,11 +17,11 @@
 <div class="container" id="middle">
     <div id="left-container">
         <h2>Messages</h2>
-        <ul id="messages"></ul>
-        <script src="scripts/websockets.js"></script>
+            <ul id="messages">
+            </ul>
     </div>
 
-    <div id="right-container">
+    <div class="right-container">
         <!-- Registration Forms -->
         {% if not authenticated %}
             Register
@@ -62,21 +62,23 @@
 </div>
 
 <div class="container" id="bottom-container">
-    <div id="right-container">
+    <div class="right-container">
         <form id="message_form">
             <label for="body_text">Enter Message:</label><br>
             <input type="text" id="body_text" name="body_text"/><br>
             <button type="submit">Send</button>
         </form>
     </div>
-    <div id="right-container">
+
+    <div class="right-container">
         <form id="dice_form">
             <label for="body_text">Enter some <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
             <input type="text" id="dice_text" name="dice_text"/><br>
             <button type="submit">Send</button>
         </form>
     </div>
-    <div id="right-container">
+
+    <div class="right-container">
         <!-- Uploading images -->
         {% if authenticated %}
         <form action="/upload-profile-pic" id="image-form" method="post" enctype="multipart/form-data">
@@ -93,6 +95,6 @@
         {% endif %}
     </div>
 </div>
-
+<script src="scripts/websockets.js"></script>
 </body>
 </html>

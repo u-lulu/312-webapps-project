@@ -16,7 +16,7 @@ import random
 
 
 # Setting up the database
-mongo_client = MongoClient("mongo:27017")
+mongo_client = MongoClient("mongo")
 db = mongo_client["animelovers"]
 user_collection = db["user"]
 message_collection = db["messages"]
@@ -30,7 +30,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 # We limit uploads to 16 megabytes
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+# app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 # app.config['SECRET_KEY'] = '140472150481043457'
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 socketio = SocketIO(app)
@@ -245,7 +245,7 @@ def text_post(text):
         "username": escape_html(name["user"]),
         "profile_pic": name["Profile-Pic"],
         "body": escape_html(text),
-        "uuid": id
+        "uuid": str(id)
     }
 
     emit('message', object)
@@ -269,7 +269,6 @@ def dice_post(syntax):
             "Could not properly parse your dice result. This usually means the result is much too large. Try rolling dice that will result in a smaller range of values.",
             400)
 
-
     object = {
         "type": "dice",
         "username": escape_html(user["user"]),
@@ -277,11 +276,12 @@ def dice_post(syntax):
         "input": escape_html(syntax),
         "output": output,
         "total": total,
-        "uuid": id
+        "uuid": str(id)
     }
 
     emit('message', object)
     message_collection.insert_one(object)
+
 
 
 @app.route("/posts", methods=['GET'])
