@@ -5,3 +5,5 @@ uuid==1.30
 func-timeout==4.3.5
 py-rolldice==0.4.0
 bcrypt~=4.1.2
+requests~=2.31.0
+werkzeug~=3.0.1

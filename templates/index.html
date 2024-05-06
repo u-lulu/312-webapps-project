@@ -17,8 +17,7 @@
 <div class="container" id="middle">
     <div id="left-container">
         <h2>Messages</h2>
-            <ul id="messages">
-            </ul>
+        <ul id="messages"></ul>
     </div>
 
     <div class="right-container">
@@ -66,6 +65,7 @@
         <form id="message_form">
             <label for="body_text">Enter Message:</label><br>
             <input type="text" id="body_text" name="body_text"/><br>
+            <input type="number" placeholder="Display duration (minutes)" id="display_duration">
             <button type="submit">Send</button>
         </form>
     </div>
@@ -74,6 +74,7 @@
         <form id="dice_form">
             <label for="body_text">Enter some <a href="https://github.com/fionafibration/py-rolldice#dice-syntax" target="_blank" rel="noreferrer noopener">Dice Syntax</a>:</label><br>
             <input type="text" id="dice_text" name="dice_text"/><br>
+            <input type="number" placeholder="Display duration (minutes)" id="display_durations">
             <button type="submit">Send</button>
         </form>
     </div>

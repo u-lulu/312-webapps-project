@@ -33,7 +33,7 @@ header {
 #left-container {
     flex: 1;
     background-color: #f2f2f2;
-    overflow-y: auto;
+    overflow-y: scroll;
     padding: 20px;
 }
 

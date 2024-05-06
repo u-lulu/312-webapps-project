@@ -1,4 +1,5 @@
 from flask_socketio import SocketIO, emit
+import requests
 import secrets
 from flask import Flask, send_file, abort, make_response, request, jsonify, redirect, url_for, flash, \
     send_from_directory, render_template
@@ -13,6 +14,10 @@ from pymongo import MongoClient
 import bcrypt
 from auth import hash_auth_token, is_authenticated, retrieve_user
 import random
+import json
+import time
+import threading
+
 
 
 # Setting up the database
@@ -20,6 +25,7 @@ mongo_client = MongoClient("mongo")
 db = mongo_client["animelovers"]
 user_collection = db["user"]
 message_collection = db["messages"]
+
 
 app = Flask(__name__)
 # Setting the upload folder to be in the uploads directory and only allowed certain file extensions
@@ -236,19 +242,35 @@ def logout():
         return response
 
 
+# Define a custom serializer function to handle datetime objects since JSON can't decode datetime objects
+def datetime_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError("Type not serializable")
+
 @socketio.on('chat_message')
 def text_post(text):
     name = retrieve_user(user_collection)
     id = make_id()
+    display_duration = int(text['date']) if text['date']  != '' else 0
+    expiration_time = (datetime.utcnow() + timedelta(minutes=display_duration))
+
     object = {
         "type": "text",
         "username": escape_html(name["user"]),
         "profile_pic": name["Profile-Pic"],
-        "body": escape_html(text),
-        "uuid": str(id)
+        "body": escape_html(text['text']),
+        "uuid": str(id),
     }
 
-    emit('message', object)
+    if display_duration > 0:
+        object["expiration_date"] = expiration_time
+
+    # Serialize the message object to JSON using the custom serializer function defined above
+    json_object = json.dumps(object, default=datetime_serializer)
+    python_object = json.loads(json_object)
+
+    emit('message', python_object)
     message_collection.insert_one(object)
 
 
@@ -256,10 +278,12 @@ def text_post(text):
 def dice_post(syntax):
     user = retrieve_user(user_collection)
     id = make_id()
+    display_duration = int(syntax['date']) if syntax['date'] != '' else 0
+    expiration_time = (datetime.utcnow() + timedelta(minutes=display_duration))
 
     total, output = None, None
     try:
-        total, output = func_timeout(5, roll_dice, args=[syntax])
+        total, output = func_timeout(5, roll_dice, args=[syntax['text']])
     except DiceGroupException as e:
         return make_response(f"{e}", 400)
     except FunctionTimedOut as e:
@@ -273,15 +297,21 @@ def dice_post(syntax):
         "type": "dice",
         "username": escape_html(user["user"]),
         "profile_pic": user["Profile-Pic"],
-        "input": escape_html(syntax),
+        "input": escape_html(syntax['text']),
         "output": output,
         "total": total,
-        "uuid": str(id)
+        "uuid": str(id),
     }
 
-    emit('message', object)
-    message_collection.insert_one(object)
+    if display_duration > 0:
+        object["expiration_date"] = expiration_time
 
+    # Serialize the message object to JSON using the custom serializer function defined above
+    json_object = json.dumps(object, default=datetime_serializer)
+    python_object = json.loads(json_object)
+
+    emit('message', python_object)
+    message_collection.insert_one(object)
 
 
 @app.route("/posts", methods=['GET'])
@@ -315,6 +345,42 @@ def test_connect(auth):
     print(f"Client '{name['user']}' connected!")
 
 
+@app.route("/delete_expired_messages", methods=["POST"])
+# Function used to check for changes in the database
+def handle_message_expiration():
+    # Get the current time
+    current_time = datetime.utcnow()
+
+    # Query for messages with expiration_time less than or equal to the current time
+    expired_messages = message_collection.find({"expiration_date": {"$lte": current_time}})
+
+    # Delete expired messages
+    for message in expired_messages:
+        message_collection.delete_one({"_id": message["_id"]})
+
+        # Send the deleted message ID to the frontend
+        socketio.emit('message_deleted', str(message["uuid"]), broadcast=True)
+
+
+def periodic_task():
+    while True:
+        handle_message_expiration()
+        # Make an HTTP POST request to trigger deletion of expired messages
+        response = requests.post("http://localhost:8080/delete_expired_messages")
+        if response.status_code == 200:
+            print("Expired messages deleted successfully")
+        else:
+            print("Failed to delete expired messages")
+
+        time.sleep(60)
+
+
+# Start the periodic task in a background thread
+thread = threading.Thread(target=periodic_task)
+thread.daemon = True  # Set the thread as a daemon, so it will be terminated when the main thread exits
+thread.start()
+
+
 @socketio.on('disconnect')
 def test_connect():
     name = retrieve_user(user_collection)
@@ -322,6 +388,5 @@ def test_connect():
 
 
 if __name__ == "__main__":
-    socketio.run(app, allow_unsafe_werkzeug=True)
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+    socketio.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=80)
+
